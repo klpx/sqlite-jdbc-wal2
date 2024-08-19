@@ -31,7 +31,7 @@ CCFLAGS:= -I$(SQLITE_OUT) -I$(SQLITE_INCLUDE) $(CCFLAGS)
 
 $(SQLITE_ARCHIVE):
 	docker build -f Dockerfile -t sqlite_wal2_amal .
-	docker rm sqlite_wal2_amal_dummy
+	docker rm -f sqlite_wal2_amal_dummy || true
 	docker create --name sqlite_wal2_amal_dummy sqlite_wal2_amal
 	@mkdir -p $(@D)
 	docker cp sqlite_wal2_amal_dummy:/sqlite.zip $@

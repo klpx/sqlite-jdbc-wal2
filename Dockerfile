@@ -16,4 +16,4 @@ RUN make sqlite3.c
 
 RUN apt install -y zip
 
-RUN zip -r ../sqlite.zip sqlite3.c shell.c sqlite3.h sqlite3ext.h VERSION
+RUN zip -r ../sqlite.zip sqlite3.c shell.c sqlite3.h sqlite3ext.h sqliteInt.h VERSION
