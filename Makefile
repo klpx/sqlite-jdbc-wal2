@@ -30,14 +30,11 @@ SQLITE_INCLUDE := $(shell dirname "$(SQLITE_HEADER)")
 CCFLAGS:= -I$(SQLITE_OUT) -I$(SQLITE_INCLUDE) $(CCFLAGS)
 
 $(SQLITE_ARCHIVE):
+	docker build -f Dockerfile -t sqlite_wal2_amal .
+	docker rm -f sqlite_wal2_amal_dummy || true
+	docker create --name sqlite_wal2_amal_dummy sqlite_wal2_amal
 	@mkdir -p $(@D)
-	curl -L --max-redirs 0 -f -o$@ https://www.sqlite.org/2024/$(SQLITE_AMAL_PREFIX).zip || \
-	curl -L --max-redirs 0 -f -o$@ https://www.sqlite.org/2023/$(SQLITE_AMAL_PREFIX).zip || \
-	curl -L --max-redirs 0 -f -o$@ https://www.sqlite.org/2022/$(SQLITE_AMAL_PREFIX).zip || \
-	curl -L --max-redirs 0 -f -o$@ https://www.sqlite.org/2021/$(SQLITE_AMAL_PREFIX).zip || \
-	curl -L --max-redirs 0 -f -o$@ https://www.sqlite.org/2020/$(SQLITE_AMAL_PREFIX).zip || \
-	curl -L --max-redirs 0 -f -o$@ https://www.sqlite.org/$(SQLITE_AMAL_PREFIX).zip || \
-	curl -L --max-redirs 0 -f -o$@ https://www.sqlite.org/$(SQLITE_OLD_AMAL_PREFIX).zip
+	docker cp sqlite_wal2_amal_dummy:/sqlite.zip $@
 
 $(SQLITE_UNPACKED): $(SQLITE_ARCHIVE)
 	unzip -qo $< -d $(TARGET)/tmp.$(version)
@@ -213,7 +210,7 @@ mac64-signed: mac64
 mac-arm64-signed: mac-arm64
 	$(CODESIGN) src/main/resources/org/sqlite/native/Mac/aarch64/libsqlitejdbc.dylib
 
-package: native-all
+package: native
 	rm -rf target/dependency-maven-plugin-markers
 	$(MVN) package
 
